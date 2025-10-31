@@ -295,6 +295,7 @@ module SkipLogic(output cin_next,
   input [3:0] a, b, input cin, cout);
   
   wire p0, p1, p2, p3, P;
+  wire nP, P1Cout, P0Cout;
   
   // Generate propagate for each bit
   xor (p0, a[0], b[0]);
@@ -302,11 +303,14 @@ module SkipLogic(output cin_next,
   xor (p2, a[2], b[2]);
   xor (p3, a[3], b[3]);
   
-  // Block propagate
+  // Block propagate: all bits must propagate
   and (P, p0, p1, p2, p3);
   
-  // Skip if all propagate, otherwise use cout
-  cin_next = P ? cin : cout;
+  // Select: if P=1 skip (use cin), else use cout
+  not (nP, P);
+  and (P1Cout, P, cin);
+  and (P0Cout, nP, cout);
+  or (cin_next, P1Cout, P0Cout);
 endmodule
 ```
 
@@ -688,6 +692,7 @@ Feel free to explore, modify, and experiment!
 **Carry in CLA:**
 - Ci = Gi + Pi · Ci-1
 
-**Carry in KSA:**
-- (G, P)i:j = (Gi:k) ⊕ (Pi:k ⊗ Gk-1:j)
+**Prefix in KSA (combining G,P pairs):**
+- G(i:j) = G(i:k) + P(i:k) · G(k-1:j)
+- P(i:j) = P(i:k) · P(k-1:j)
 
