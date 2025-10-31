@@ -3,6 +3,15 @@ Implementing Different Adder Structures in Verilog
 
 The Aim of this project is to describe and differentiate different types of adders in verilog and distinguish them at simulation level.
 All adders have been defined for **8, 16, 32 and 64 bit** addition along with test benches for each type of adder.
+
+## 📊 Educational Slides Available!
+
+**NEW**: Comprehensive slide deck for teaching these adders to undergraduate students!
+- See **[Adder_Slides.md](Adder_Slides.md)** - Complete presentation covering all adder types
+- See **[SLIDES_README.md](SLIDES_README.md)** - Instructions for using the slides
+- 39 slides covering theory, implementation, and performance comparison
+- Ready to use with Marp, reveal.js, or any Markdown presentation tool
+
 This project implements the following adders :
 
 * Carry Lookahead Adder
