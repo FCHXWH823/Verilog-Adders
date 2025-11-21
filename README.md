@@ -43,7 +43,8 @@ The carry-select adder generally consists of two ripple carry adders and a multi
 
 ## Carry Skip Adder
 
-![alt text](https://www.researchgate.net/profile/Sujan_Sarkar3/publication/322057640/figure/fig3/AS:631632960700450@1527604441337/8-bit-Carry-Skip-Adder.png)  
+<img width="728" height="248" alt="image" src="https://github.com/user-attachments/assets/04f0572b-1613-41f0-ade1-888de66272e8" />
+
 4-bit Carry Skip Adder
 
 
