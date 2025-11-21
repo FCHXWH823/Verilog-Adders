@@ -5,8 +5,9 @@ The Aim of this project is to describe and differentiate different types of adde
 All adders have been defined for **8, 16, 32 and 64 bit** addition along with test benches for each type of adder.
 This project implements the following adders :
 
+* Carry Ripple Adder (baseline)
+-------------------------------------
 * Carry Lookahead Adder
-* Carry Ripple Adder
 * Carry Select Adder
 * Carry Skip Adder
 * Kogge Stone Adder
