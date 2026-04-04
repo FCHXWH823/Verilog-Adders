@@ -12,7 +12,7 @@ This project implements the following adders :
 * Kogge Stone Adder
 * Hybrid Adder
 
-## Carry Ripple Adder
+## Ripple Carry Adder
 ![alt text](image.png)
 4-bit Carry Ripple Adder
 
