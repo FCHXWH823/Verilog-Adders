@@ -6,22 +6,11 @@ All adders have been defined for **8, 16, 32 and 64 bit** addition along with te
 This project implements the following adders :
 
 * Carry Ripple Adder (baseline)
--------------------------------------
 * Carry Lookahead Adder
 * Carry Select Adder
 * Carry Skip Adder
 * Kogge Stone Adder
 * Hybrid Adder
-
-## Carry Lookaheaed Adder
-
-![alt text](https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/4-bit_carry_lookahead_adder.svg/500px-4-bit_carry_lookahead_adder.svg.png)       
-4-bit Carry Lookahead Adder
-
-A carry-look ahead adder improves speed by reducing the amount of time required to determine carry bits. It can be contrasted with the simpler, but usually slower, ripple-carry adder (RCA), for which the carry bit is calculated alongside the sum bit, and each stage must wait until the previous carry bit has been calculated to begin calculating its own sum bit and carry bit. The carry-lookahead adder calculates one or more carry bits before the sum, which reduces the wait time to calculate the result of the larger-value bits of the adder. The Kogge–Stone adder (KSA) and Brent–Kung adder (BKA) are examples of this type of adder.
-Carry-lookahead depends on two things:
-* Calculating for each digit position whether that position is going to propagate a carry if one comes in from the right.
-* Combining these calculated values to be able to deduce quickly whether, for each group of digits, that group is going to propagate a carry that comes in from the right.
 
 ## Carry Ripple Adder
 
@@ -32,6 +21,15 @@ Carry-lookahead depends on two things:
 It is possible to create a logical circuit using multiple full adders to add N-bit numbers. Each full adder inputs a Cin, which is the Cout of the previous adder. This kind of adder is called a ripple-carry adder (RCA), since each carry bit "ripples" to the next full adder. Note that the first (and only the first) full adder may be replaced by a half adder (under the assumption that Cin = 0).
 The layout of a ripple-carry adder is simple, which allows fast design time; however, the ripple-carry adder is relatively slow, since each full adder must wait for the carry bit to be calculated from the previous full adder.
 
+## Carry Lookaheaed Adder
+
+![alt text](https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/4-bit_carry_lookahead_adder.svg/500px-4-bit_carry_lookahead_adder.svg.png)       
+4-bit Carry Lookahead Adder
+
+A carry-look ahead adder improves speed by reducing the amount of time required to determine carry bits. It can be contrasted with the simpler, but usually slower, ripple-carry adder (RCA), for which the carry bit is calculated alongside the sum bit, and each stage must wait until the previous carry bit has been calculated to begin calculating its own sum bit and carry bit. The carry-lookahead adder calculates one or more carry bits before the sum, which reduces the wait time to calculate the result of the larger-value bits of the adder. The Kogge–Stone adder (KSA) and Brent–Kung adder (BKA) are examples of this type of adder.
+Carry-lookahead depends on two things:
+* Calculating for each digit position whether that position is going to propagate a carry if one comes in from the right.
+* Combining these calculated values to be able to deduce quickly whether, for each group of digits, that group is going to propagate a carry that comes in from the right.
 
 ## Carry Select Adder
 
