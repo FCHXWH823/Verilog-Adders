@@ -29,15 +29,6 @@ Carry-lookahead depends on two things:
 * Calculating for each digit position whether that position is going to propagate a carry if one comes in from the right.
 * Combining these calculated values to be able to deduce quickly whether, for each group of digits, that group is going to propagate a carry that comes in from the right.
 
-## Carry Select Adder
-
-![alt text](image-1.png)
-4-bit Carry Select Adder
-
-
-The carry-select adder generally consists of two ripple carry adders and a multiplexer. Adding two n-bit numbers with a carry-select adder is done with two adders (therefore two ripple carry adders), in order to perform the calculation twice, one time with the assumption of the carry-in being zero and the other assuming it will be one. After the two results are calculated, the correct sum, as well as the correct carry-out, is then selected with the multiplexer once the correct carry-in is known
-
-
 ## Carry Skip Adder
 
 ![alt text](image-2.png)
@@ -46,6 +37,14 @@ The carry-select adder generally consists of two ripple carry adders and a multi
 
 The worst case for a simple one level carry-ripple-adder occurs, when the propagate-condition is true for each digit pair. Then the carry-in ripples through the n n-bit adder and appears as the carry-out after definitive delay
 For each operand input bit pair  the propagate-conditions using an XOR-Gate (see ). When all propagate-conditions are true, then the carry-in bit  determines the carry-out bit. The n-bit-carry-skip adder consists of a n-bit-carry-ripple-chain, a n-input AND-gate and one multiplexer. Each propagate bit that is provided by the carry-ripple-chain is connected to the n-input AND-gate. The resulting bit is used as the select bit of a multiplexer that switches either the last carry-bit or the carry-in  to the carry-out signal.
+
+## Carry Select Adder
+
+![alt text](image-1.png)
+4-bit Carry Select Adder
+
+
+The carry-select adder generally consists of two ripple carry adders and a multiplexer. Adding two n-bit numbers with a carry-select adder is done with two adders (therefore two ripple carry adders), in order to perform the calculation twice, one time with the assumption of the carry-in being zero and the other assuming it will be one. After the two results are calculated, the correct sum, as well as the correct carry-out, is then selected with the multiplexer once the correct carry-in is known
 
 
 ## Kogge Stone Adder
