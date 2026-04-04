@@ -5,7 +5,7 @@ The Aim of this project is to describe and differentiate different types of adde
 All adders have been defined for **8, 16, 32 and 64 bit** addition along with test benches for each type of adder.
 This project implements the following adders :
 
-* Carry Ripple Adder (baseline)
+* Carry Ripple Adder
 * Carry Lookahead Adder
 * Carry Select Adder
 * Carry Skip Adder
@@ -13,10 +13,8 @@ This project implements the following adders :
 * Hybrid Adder
 
 ## Carry Ripple Adder
-
-![alt text](https://www.researchgate.net/publication/283037309/figure/fig2/AS:454461651984390@1485363509931/Eight-bit-Ripple-Carry-adder.png)  
-8-bit Carry Ripple Adder
-
+![alt text](image.png)
+4-bit Carry Ripple Adder
 
 It is possible to create a logical circuit using multiple full adders to add N-bit numbers. Each full adder inputs a Cin, which is the Cout of the previous adder. This kind of adder is called a ripple-carry adder (RCA), since each carry bit "ripples" to the next full adder. Note that the first (and only the first) full adder may be replaced by a half adder (under the assumption that Cin = 0).
 The layout of a ripple-carry adder is simple, which allows fast design time; however, the ripple-carry adder is relatively slow, since each full adder must wait for the carry bit to be calculated from the previous full adder.
@@ -33,7 +31,7 @@ Carry-lookahead depends on two things:
 
 ## Carry Select Adder
 
-![alt text](https://upload.wikimedia.org/wikipedia/en/thumb/1/10/Carry-select-adder-detailed-block.png/712px-Carry-select-adder-detailed-block.png)  
+![alt text](image-1.png)
 4-bit Carry Select Adder
 
 
@@ -42,8 +40,7 @@ The carry-select adder generally consists of two ripple carry adders and a multi
 
 ## Carry Skip Adder
 
-<img width="728" height="248" alt="image" src="https://github.com/user-attachments/assets/04f0572b-1613-41f0-ade1-888de66272e8" />
-
+![alt text](image-2.png)
 4-bit Carry Skip Adder
 
 
@@ -53,7 +50,7 @@ For each operand input bit pair  the propagate-conditions using an XOR-Gate (see
 
 ## Kogge Stone Adder
 
-![alt text](https://elnndccpro.files.wordpress.com/2017/01/4bit-kogge-stone-adder.jpg)  
+![alt text](4_bit_Kogge_Stone_Adder_Example_new.png)
 4-bit Kogge Stone Adder
 
 
