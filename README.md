@@ -1,56 +1,130 @@
-# Verilog-Adders
-Implementing Different Adder Structures in Verilog
+# Verilog Adders
 
-The Aim of this project is to describe and differentiate different types of adders in verilog and distinguish them at simulation level.
-All adders have been defined for **8, 16, 32 and 64 bit** addition along with test benches for each type of adder.
-This project implements the following adders :
+Structural Verilog implementations of six adder architectures for studying how carry computation changes area, delay, and wiring complexity. The repository currently contains 4-bit and 8-bit designs, plus an 8-bit hybrid adder.
 
-* Carry Ripple Adder
-* Carry Lookahead Adder
-* Carry Select Adder
-* Carry Skip Adder
-* Kogge Stone Adder
-* Hybrid Adder
+## Architecture overview
 
-## Ripple Carry Adder
-![alt text](image.png)
-4-bit Carry Ripple Adder
+| Architecture | Carry strategy | Typical tradeoff | RTL in this repository |
+|---|---|---|---|
+| Ripple Carry (RCA) | Carry moves through every full-adder stage | Small and regular, but linear carry delay | 4-bit, 8-bit |
+| Carry Lookahead (CLA) | Expanded generate/propagate equations form carries in parallel | Shorter carry path, with more logic and fan-in | 4-bit, 8-bit |
+| Carry Select (CSA) | Candidate results for carry-in 0 and 1 are computed in parallel | Faster block selection, at the cost of duplicated hardware | 4-bit, 8-bit |
+| Carry Skip (CSkipA) | A block-propagate condition bypasses the ripple path | Moderate area and delay between RCA and more aggressive schemes | 4-bit, 8-bit |
+| Kogge--Stone (KSA) | A parallel-prefix tree combines generate/propagate pairs | Logarithmic prefix depth, with substantial wiring and node count | 4-bit, 8-bit |
+| Hybrid (HA) | Different carry structures are used in different bit ranges | Lets a design target local timing/area goals | 8-bit |
 
-It is possible to create a logical circuit using multiple full adders to add N-bit numbers. Each full adder inputs a Cin, which is the Cout of the previous adder. This kind of adder is called a ripple-carry adder (RCA), since each carry bit "ripples" to the next full adder. Note that the first (and only the first) full adder may be replaced by a half adder (under the assumption that Cin = 0).
-The layout of a ripple-carry adder is simple, which allows fast design time; however, the ripple-carry adder is relatively slow, since each full adder must wait for the carry bit to be calculated from the previous full adder.
+These are educational, gate-level/structural implementations. Use synthesis and timing analysis—not the diagrams alone—to compare power, performance, and area in a target technology.
 
-## Carry Lookaheaed Adder
+## Repository layout
 
-![alt text](https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/4-bit_carry_lookahead_adder.svg/500px-4-bit_carry_lookahead_adder.svg.png)       
-4-bit Carry Lookahead Adder
+```text
+Carry Ripple Adder/       RCA4.v, RCA8.v
+Carry Lookahead Adder/    CLA4.v, CLA8.v
+Carry Select Adder/       CSA4.v, CSA8.v
+Carry Skip Adder/         CSkipA4.v, CSkipA8.v
+Kogge-Stone Adder/        KSA4.v, KSA8.v
+Hybrid Adder/             HA8.v
+docs/diagrams/            Beamer/TikZ source and generated architecture figures
+```
 
-A carry-look ahead adder improves speed by reducing the amount of time required to determine carry bits. It can be contrasted with the simpler, but usually slower, ripple-carry adder (RCA), for which the carry bit is calculated alongside the sum bit, and each stage must wait until the previous carry bit has been calculated to begin calculating its own sum bit and carry bit. The carry-lookahead adder calculates one or more carry bits before the sum, which reduces the wait time to calculate the result of the larger-value bits of the adder. The Kogge–Stone adder (KSA) and Brent–Kung adder (BKA) are examples of this type of adder.
-Carry-lookahead depends on two things:
-* Calculating for each digit position whether that position is going to propagate a carry if one comes in from the right.
-* Combining these calculated values to be able to deduce quickly whether, for each group of digits, that group is going to propagate a carry that comes in from the right.
+Every top-level module uses the same basic interface:
 
-## Carry Skip Adder
+```verilog
+module <NAME>(
+    output [N-1:0] sum,
+    output         cout,
+    input  [N-1:0] a,
+    input  [N-1:0] b
+);
+```
 
-![alt text](image-2.png)
-4-bit Carry Skip Adder
+The repository's top-level adders assume an initial carry-in of zero. Internal helper modules may expose a carry-in port.
 
+## Adder architectures
 
-The worst case for a simple one level carry-ripple-adder occurs, when the propagate-condition is true for each digit pair. Then the carry-in ripples through the n n-bit adder and appears as the carry-out after definitive delay
-For each operand input bit pair  the propagate-conditions using an XOR-Gate (see ). When all propagate-conditions are true, then the carry-in bit  determines the carry-out bit. The n-bit-carry-skip adder consists of a n-bit-carry-ripple-chain, a n-input AND-gate and one multiplexer. Each propagate bit that is provided by the carry-ripple-chain is connected to the n-input AND-gate. The resulting bit is used as the select bit of a multiplexer that switches either the last carry-bit or the carry-in  to the carry-out signal.
+### Ripple Carry Adder
 
-## Carry Select Adder
+![Ripple Carry Adder architecture](docs/diagrams/png/ripple-carry.png)
 
-![alt text](image-1.png)
-4-bit Carry Select Adder
+An RCA chains full adders so that each stage consumes the previous stage's carry. Its layout is compact and easy to scale, but the worst-case carry path crosses all `N` stages.
 
+Code: [RCA4.v](Carry%20Ripple%20Adder/RCA4.v) · [RCA8.v](Carry%20Ripple%20Adder/RCA8.v)
 
-The carry-select adder generally consists of two ripple carry adders and a multiplexer. Adding two n-bit numbers with a carry-select adder is done with two adders (therefore two ripple carry adders), in order to perform the calculation twice, one time with the assumption of the carry-in being zero and the other assuming it will be one. After the two results are calculated, the correct sum, as well as the correct carry-out, is then selected with the multiplexer once the correct carry-in is known
+### Carry Lookahead Adder
 
+![Carry Lookahead Adder architecture](docs/diagrams/png/carry-lookahead.png)
 
-## Kogge Stone Adder
+The CLA first forms bit generate and propagate terms, `G_i = a_i & b_i` and `P_i = a_i ^ b_i`. It expands the carry recurrence so that multiple carries can be evaluated without waiting for a serial ripple chain.
 
-![alt text](4_bit_Kogge_Stone_Adder_Example_new.png)
-4-bit Kogge Stone Adder
+Code: [CLA4.v](Carry%20Lookahead%20Adder/CLA4.v) · [CLA8.v](Carry%20Lookahead%20Adder/CLA8.v)
 
+### Carry Select Adder
 
-Each vertical stage produces a "propagate" and a "generate" bit, as shown. The culminating generate bits (the carries) are produced in the last stage (vertically), and these bits are XOR'd with the initial propagate after the input (the red boxes) to produce the sum bits. E.g., the first (least-significant) sum bit is calculated by XORing the propagate in the farthest-right red box (a "1") with the carry-in (a "0"), producing a "1". The second bit is calculated by XORing the propagate in second box from the right (a "0") with C0 (a "0"), producing a "0".
+![Carry Select Adder architecture](docs/diagrams/png/carry-select.png)
+
+Each group computes two candidate sums: one for carry-in 0 and one for carry-in 1. When the real group carry arrives, multiplexers select the valid sum and carry. This reduces carry-dependent computation after the group boundary while duplicating arithmetic logic.
+
+Code: [CSA4.v](Carry%20Select%20Adder/CSA4.v) · [CSA8.v](Carry%20Select%20Adder/CSA8.v)
+
+### Carry Skip Adder
+
+![Carry Skip Adder architecture](docs/diagrams/png/carry-skip.png)
+
+Within each group, the sum is produced by a ripple chain. If every bit in that group propagates carry, the block-propagate signal selects a bypass path and forwards the incoming carry directly to the next group.
+
+Code: [CSkipA4.v](Carry%20Skip%20Adder/CSkipA4.v) · [CSkipA8.v](Carry%20Skip%20Adder/CSkipA8.v)
+
+### Kogge--Stone Adder
+
+![Kogge--Stone Adder architecture](docs/diagrams/png/kogge-stone.png)
+
+The KSA combines generate/propagate pairs in a prefix tree with spans of 1, 2, 4, and so on. Its prefix depth grows logarithmically with bit width, although the dense tree increases wiring and prefix-node count.
+
+Code: [KSA4.v](Kogge-Stone%20Adder/KSA4.v) · [KSA8.v](Kogge-Stone%20Adder/KSA8.v)
+
+### Hybrid Adder
+
+![Hybrid Adder architecture](docs/diagrams/png/hybrid.png)
+
+The repository's `HA8` uses a CLA4 for bits `[3:0]`. Its carry-out drives the carry-in of a 4-bit Kogge--Stone block for bits `[7:4]`. The design demonstrates how carry architectures can be composed rather than applied uniformly across the full width.
+
+Code: [HA8.v](Hybrid%20Adder/HA8.v)
+
+## Scaling the designs
+
+When extending an architecture to a larger bit width, preserve its carry strategy rather than only duplicating syntax:
+
+- RCA: add full-adder stages and continue the carry chain.
+- CLA: derive the larger generate/propagate carry equations, or introduce a hierarchy of lookahead groups.
+- CSA: choose group sizes, build both carry assumptions per group, and connect the selection chain.
+- Carry Skip: choose ripple-block sizes and compute a block-propagate signal for each bypass mux.
+- KSA: add prefix levels at distances `1, 2, 4, ...` until the full width is covered.
+- Hybrid: define the boundary between component architectures and connect the boundary carry explicitly.
+
+For a generated design, verify both arithmetic correctness and architecture-specific structure. A correct `sum = a + b` behavioral description does not by itself demonstrate the intended carry network.
+
+## Quick syntax check
+
+With [Icarus Verilog](https://steveicarus.github.io/iverilog/) installed, a design can be elaborated directly:
+
+```sh
+iverilog -g2012 -Wall -s RCA8 -o /tmp/rca8.vvp "Carry Ripple Adder/RCA8.v"
+```
+
+Substitute another top-level name and source file to check a different implementation. Functional verification requires a testbench or another reference model.
+
+## Rebuilding the diagrams
+
+All six figures share one Beamer/TikZ source: [adder_architectures.tex](docs/diagrams/adder_architectures.tex). The compiled six-page version is available as [adder_architectures.pdf](docs/diagrams/adder_architectures.pdf).
+
+```sh
+cd docs/diagrams
+latexmk -xelatex -interaction=nonstopmode -halt-on-error adder_architectures.tex
+pdftoppm -png -r 200 adder_architectures.pdf png/architecture
+```
+
+The six exported pages correspond, in order, to RCA, CLA, CSA, Carry Skip, Kogge--Stone, and Hybrid. The repository's named PNG files are these pages renamed for stable README links.
+
+## License
+
+Licensed under the [Apache License 2.0](LICENSE).
