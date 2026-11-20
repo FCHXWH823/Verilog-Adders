@@ -40,20 +40,20 @@
 \begin{tikzpicture}[x=1cm,y=1cm]
   \foreach \i/\x in {0/-3.6,1/-1.2,2/1.2,3/3.6}{
     \node[block] (fa\i) at (\x,0) {Full Adder\\bit \i};
-    \node[label] (a\i) at ($(fa\i.north)+(-.35,.72)$) {$a_{\i}$};
-    \node[label] (b\i) at ($(fa\i.north)+(.35,.72)$) {$b_{\i}$};
-    \draw[data] (a\i) -- ($(fa\i.north)+(-.35,0)$);
-    \draw[data] (b\i) -- ($(fa\i.north)+(.35,0)$);
-    \node[label] (s\i) at ($(fa\i.south)+(0,-.72)$) {$s_{\i}$};
+    \node[label] (a\i) at ($(fa\i.north)+(-.35,.88)$) {$a_{\i}$};
+    \node[label] (b\i) at ($(fa\i.north)+(.35,.88)$) {$b_{\i}$};
+    \draw[data] (a\i.south) -- ($(fa\i.north)+(-.35,0)$);
+    \draw[data] (b\i.south) -- ($(fa\i.north)+(.35,0)$);
+    \node[label] (s\i) at ($(fa\i.south)+(0,-.88)$) {$s_{\i}$};
     \draw[data] (fa\i.south) -- (s\i);
   }
-  \node[label] (cin) at (-5.25,0) {$c_0=0$};
-  \draw[carry] (cin) -- (fa0.west);
+  \node[label,anchor=east] (cin) at (-5.40,0) {$c_0=0$};
+  \draw[carry] (cin.east) -- (fa0.west);
   \draw[carry] (fa0.east) -- node[above,note] {$c_1$} (fa1.west);
   \draw[carry] (fa1.east) -- node[above,note] {$c_2$} (fa2.west);
   \draw[carry] (fa2.east) -- node[above,note] {$c_3$} (fa3.west);
-  \node[label] (cout) at (5.25,0) {$c_4$};
-  \draw[carry] (fa3.east) -- (cout);
+  \node[label,anchor=west] (cout) at (5.40,0) {$c_4$};
+  \draw[carry] (fa3.east) -- (cout.west);
   \node[note] at (0,-2.0) {Simple and area-efficient; worst-case delay grows linearly with bit width.};
 \end{tikzpicture}
 \end{frame}
@@ -65,11 +65,11 @@
   \foreach \i/\x in {0/-3.6,1/-1.2,2/1.2,3/3.6}{
     \node[block,minimum width=1.45cm,minimum height=1.25cm] (fa\i) at (\x,.85)
       {Full\\Adder};
-    \node[label] (a\i) at ($(fa\i.north)+(-.34,.68)$) {$a_{\i}$};
-    \node[label] (b\i) at ($(fa\i.north)+(.34,.68)$) {$b_{\i}$};
-    \draw[data] (a\i) -- ($(fa\i.north)+(-.34,0)$);
-    \draw[data] (b\i) -- ($(fa\i.north)+(.34,0)$);
-    \node[label] (s\i) at ($(fa\i.south)+(0,-.54)$) {$s_{\i}$};
+    \node[label] (a\i) at ($(fa\i.north)+(-.34,.82)$) {$a_{\i}$};
+    \node[label] (b\i) at ($(fa\i.north)+(.34,.82)$) {$b_{\i}$};
+    \draw[data] (a\i.south) -- ($(fa\i.north)+(-.34,0)$);
+    \draw[data] (b\i.south) -- ($(fa\i.north)+(.34,0)$);
+    \node[label] (s\i) at ($(fa\i.south)+(0,-.72)$) {$s_{\i}$};
     \draw[data] (fa\i.south) -- (s\i);
   }
 
@@ -85,9 +85,10 @@
   \draw[carry] (c2tap) -- ++(0,1.93) -- node[above,note] {$C_2$} (fa2.west);
   \draw[carry] (c3tap) -- ++(0,1.93) -- node[above,note] {$C_3$} (fa3.west);
 
-  \node[label] (cin) at (-5.12,.85) {$C_0$};
-  \draw[carry] (cin) -- (fa0.west);
-  \draw[carry] (cin) -- ++(-.35,0) |- (look.west);
+  \node[label,anchor=east] (cin) at (-5.20,.85) {$C_0$};
+  \draw[carry] (cin.east) -- (fa0.west);
+  \coordinate (cinbranch) at (-4.82,.85);
+  \draw[carry] (cinbranch) |- (look.west);
   \coordinate (c4end) at (6.00,-1.55);
   \draw[carry] (look.east) -- (c4end);
   \node[label,anchor=west] at (6.12,-1.55) {$C_4$};
@@ -106,38 +107,38 @@
 % 3. Carry Select Adder
 \begin{frame}{Carry Select Adder (CSA)}
 \centering
-\begin{tikzpicture}[x=1cm,y=.90cm]
+\begin{tikzpicture}[scale=.93,every node/.style={transform shape},x=1cm,y=.90cm]
   % Two complete carry chains are evaluated in parallel. The upper row
   % assumes carry-in 0 and the lower row assumes carry-in 1.
   \foreach \i/\x in {0/-3.3,1/-1.1,2/1.1,3/3.3}{
-    \node[smallblock,minimum width=1.12cm,minimum height=.70cm] (fa0\i) at (\x-.25,1.30)
+    \node[smallblock,minimum width=1.12cm,minimum height=.70cm] (fa0\i) at (\x-.25,1.45)
       {FA bit \i};
-    \node[smallblock,minimum width=1.12cm,minimum height=.70cm] (fa1\i) at (\x+.25,-.05)
+    \node[smallblock,minimum width=1.12cm,minimum height=.70cm] (fa1\i) at (\x+.25,-.15)
       {FA bit \i};
 
-    \node[label] (ab0\i) at (\x-.25,2.02) {$a_{\i},b_{\i}$};
-    \node[label] (ab1\i) at (\x+.25,.58) {$a_{\i},b_{\i}$};
-    \draw[data] (ab0\i) -- (fa0\i.north);
-    \draw[data] (ab1\i) -- (fa1\i.north);
+    \node[label] (ab0\i) at (\x-.25,2.90) {$a_{\i},b_{\i}$};
+    \node[label] (ab1\i) at (\x+.25,1.05) {$a_{\i},b_{\i}$};
+    \draw[data] (ab0\i.south) -- (fa0\i.north);
+    \draw[data] (ab1\i.south) -- (fa1\i.north);
 
     % Downward sum mux: upper candidate enters on the left, lower candidate
     % on the right, and the selected sum leaves at the bottom.
-    \coordinate (smul\i) at (\x-.66,-.86);
-    \coordinate (smur\i) at (\x+.66,-.86);
-    \coordinate (smlr\i) at (\x+.44,-1.42);
-    \coordinate (smll\i) at (\x-.44,-1.42);
+    \coordinate (smul\i) at (\x-.66,-1.15);
+    \coordinate (smur\i) at (\x+.66,-1.15);
+    \coordinate (smlr\i) at (\x+.44,-1.80);
+    \coordinate (smll\i) at (\x-.44,-1.80);
     \path[draw=Purple,fill=white,thick]
       (smul\i) -- (smur\i) -- (smlr\i) -- (smll\i) -- cycle;
-    \node[note,text=Purple] at (\x,-1.13) {MUX};
+    \node[note,text=Purple] at (\x,-1.47) {MUX};
 
-    \draw[data] (fa0\i.south) -- ++(0,-.22) -| (\x-.48,-.86);
-    \draw[data] (fa1\i.south) -- (\x+.34,-.86);
-    \node[label] (sum\i) at (\x,-1.93) {$s_{\i}$};
-    \draw[data] (\x,-1.42) -- (sum\i);
+    \draw[data] (fa0\i.south) -- ++(0,-.26) -| (\x-.48,-1.15);
+    \draw[data] (fa1\i.south) -- (\x+.25,-1.15);
+    \node[label] (sum\i) at (\x,-2.75) {$s_{\i}$};
+    \draw[data] (\x,-1.80) -- (sum\i.north);
   }
 
-  \node[note,anchor=east] (zero) at (-4.35,1.30) {candidate $C_{in}=0$};
-  \node[note,anchor=east] (one) at (-3.85,-.05) {candidate $C_{in}=1$};
+  \node[note,anchor=east] (zero) at (-5.15,1.45) {candidate $C_{in}=0$};
+  \node[note,anchor=east] (one) at (-5.15,-.15) {candidate $C_{in}=1$};
   \draw[carry] (zero.east) -- (fa00.west);
   \draw[carry] (one.east) -- (fa10.west);
   \foreach \i/\j in {0/1,1/2,2/3}{
@@ -147,26 +148,26 @@
 
   % The final mux chooses the candidate carry-out. All signal flow remains
   % left-to-right, matching the requested orientation.
-  \coordinate (cmul) at (4.38,.94);
-  \coordinate (cmur) at (5.10,.74);
-  \coordinate (cmlr) at (5.10,-.46);
-  \coordinate (cmll) at (4.38,-.66);
+  \coordinate (cmul) at (4.90,1.72);
+  \coordinate (cmur) at (5.75,1.47);
+  \coordinate (cmlr) at (5.75,-.17);
+  \coordinate (cmll) at (4.90,-.42);
   \path[draw=Purple,fill=white,thick] (cmul) -- (cmur) -- (cmlr) -- (cmll) -- cycle;
-  \node[label] at (4.58,.53) {0};
-  \node[label] at (4.58,-.26) {1};
-  \draw[carry] (fa03.east) -- ++(.15,0) |- (4.38,.53);
-  \draw[carry] (fa13.east) -- (4.38,-.26);
-  \node[label] (cout) at (5.72,.14) {$C_{out}$};
-  \draw[carry] (5.10,.14) -- (cout);
+  \node[label] at (5.10,1.30) {0};
+  \node[label] at (5.10,-.15) {1};
+  \draw[carry] (fa03.east) -- (4.90,1.45);
+  \draw[carry] (fa13.east) -- (4.90,-.15);
+  \node[label,anchor=west] (cout) at (6.80,.65) {$C_{out}$};
+  \draw[carry] (5.75,.65) -- (cout.west);
 
   % The real carry-in runs on a separate control bus. Each branch enters a
   % mux from its side, leaving the bottom output exclusively for S_i.
-  \node[label] (select) at (-4.35,-2.35) {$C_{in}$ selects};
-  \draw[draw=Purple,thick,dashed] (select.east) -- (4.72,-2.35);
+  \node[label,anchor=east] (select) at (-5.15,-2.90) {$C_{in}$ selects};
+  \draw[draw=Purple,thick,dashed] (select.east) -- (5.32,-2.90);
   \foreach \x in {-3.3,-1.1,1.1,3.3}{
-    \draw[control] (\x-.82,-2.35) |- (\x-.55,-1.14);
+    \draw[control] (\x-.82,-2.90) |- (\x-.55,-1.47);
   }
-  \draw[control] (4.72,-2.35) -- (4.72,-.56);
+  \draw[control] (5.32,-2.90) -- (5.32,-.30);
 \end{tikzpicture}
 \end{frame}
 
@@ -174,46 +175,46 @@
 \begin{frame}{Carry Skip Adder (CSkipA)}
 \centering
 \begin{tikzpicture}[x=1cm,y=1cm]
-  \foreach \i/\x in {0/-4.0,1/-1.95,2/.10,3/2.15}{
+  \foreach \i/\x in {0/-4.20,1/-1.90,2/.40,3/2.70}{
     \node[block,minimum width=1.45cm,minimum height=1.22cm] (fa\i) at (\x,.55)
       {Full\\Adder};
-    \node[label] (a\i) at ($(fa\i.north)+(-.30,.66)$) {$a_{\i}$};
-    \node[label] (b\i) at ($(fa\i.north)+(.30,.66)$) {$b_{\i}$};
-    \draw[data] (a\i) -- ($(fa\i.north)+(-.30,0)$);
-    \draw[data] (b\i) -- ($(fa\i.north)+(.30,0)$);
-    \node[label] (s\i) at ($(fa\i.south)+(0,-.52)$) {$s_{\i}$};
+    \node[label] (a\i) at ($(fa\i.north)+(-.30,.82)$) {$a_{\i}$};
+    \node[label] (b\i) at ($(fa\i.north)+(.30,.82)$) {$b_{\i}$};
+    \draw[data] (a\i.south) -- ($(fa\i.north)+(-.30,0)$);
+    \draw[data] (b\i.south) -- ($(fa\i.north)+(.30,0)$);
+    \node[label] (s\i) at ($(fa\i.south)+(0,-.72)$) {$s_{\i}$};
     \draw[data] (fa\i.south) -- (s\i);
   }
 
-  \node[label] (cin) at (-5.35,.55) {$C_0=C_{in}$};
-  \draw[carry] (cin) -- (fa0.west);
+  \node[label,anchor=east] (cin) at (-5.55,.55) {$C_0=C_{in}$};
+  \draw[carry] (cin.east) -- (fa0.west);
   \draw[carry] (fa0.east) -- node[above,note] {$C_1$} (fa1.west);
   \draw[carry] (fa1.east) -- node[above,note] {$C_2$} (fa2.west);
   \draw[carry] (fa2.east) -- node[above,note] {$C_3$} (fa3.west);
 
   % Compact vertical carry mux: ripple carry enters input 0 and bypass carry
   % enters input 1. A shallow taper avoids the oversized wedge shape.
-  \coordinate (muxul) at (4.02,.82);
-  \coordinate (muxur) at (4.82,.62);
-  \coordinate (muxlr) at (4.82,-.62);
-  \coordinate (muxll) at (4.02,-.82);
+  \coordinate (muxul) at (4.40,.82);
+  \coordinate (muxur) at (5.20,.62);
+  \coordinate (muxlr) at (5.20,-.62);
+  \coordinate (muxll) at (4.40,-.82);
   \path[draw=Purple,fill=Purple!7,thick] (muxul) -- (muxur) -- (muxlr) -- (muxll) -- cycle;
-  \coordinate (muxzero) at (4.02,.42);
-  \coordinate (muxone) at (4.02,-.42);
-  \coordinate (muxselect) at (4.42,.72);
-  \coordinate (muxout) at (4.82,0);
-  \node[note,text=Purple] at (4.48,0) {MUX};
-  \node[label] at (4.14,.42) {0};
-  \node[label] at (4.14,-.42) {1};
+  \coordinate (muxzero) at (4.40,.42);
+  \coordinate (muxone) at (4.40,-.42);
+  \coordinate (muxselect) at (4.80,.72);
+  \coordinate (muxout) at (5.20,0);
+  \node[note,text=Purple] at (4.86,0) {MUX};
+  \node[label] at (4.52,.42) {0};
+  \node[label] at (4.52,-.42) {1};
   \draw[carry] (fa3.east) -- node[above,note] {$C_4^{ripple}$} (muxzero);
-  \node[label] (cout) at (5.55,0) {$C_4$};
-  \draw[carry] (muxout) -- (cout);
+  \node[label,anchor=west] (cout) at (6.25,0) {$C_4$};
+  \draw[carry] (muxout) -- (cout.west);
 
   % If all four bits propagate, the incoming carry takes the lower bypass
   % input of the mux instead of waiting for the four-stage ripple path.
-  \coordinate (cinbranch) at (-5.02,.55);
+  \coordinate (cinbranch) at (-5.20,.55);
   \draw[carry] (cinbranch) -- ++(0,-1.82) -| node[below,note,pos=.55] {skip path} (muxone);
-  \node[label,align=center] (propagate) at (4.42,1.92)
+  \node[label,align=center] (propagate) at (4.80,1.92)
     {$p_i=a_i\oplus b_i$\\$P_B=p_0p_1p_2p_3$};
   \draw[control] (propagate.south) -- (muxselect);
   \node[note] at (0,-2.05) {When $P_B=1$, the mux forwards $C_{in}$ directly; otherwise it uses the ripple carry.};
@@ -230,8 +231,8 @@
   \foreach \i/\x in {0/-3,1/-1,2/1,3/3}{
     \node[pg,minimum width=.88cm,minimum height=.62cm] (sq\i) at (\x,2.45)
       {$P_{\i},G_{\i}$};
-    \node[label] (in\i) at (\x,3.10) {$a_{\i},b_{\i}$};
-    \draw[data] (in\i) -- (sq\i.north);
+    \node[label] (in\i) at (\x,3.45) {$a_{\i},b_{\i}$};
+    \draw[data] (in\i.south) -- (sq\i.north);
   }
 
   % Prefix row 1: distance 1.
@@ -263,26 +264,26 @@
   \draw[draw=Navy,thick] (bc11.south) -- (bc23.north west);
 
   \foreach \i/\x/\source in {0/-3/sc20,1/-1/sc21,2/1/bc22,3/3/bc23}{
-    \node[label] (carry\i) at (\x,-.55) {$C_{\the\numexpr\i+1\relax}$};
-    \draw[carry] (\source.south) -- (carry\i);
+    \node[label] (carry\i) at (\x,-1.00) {$C_{\the\numexpr\i+1\relax}$};
+    \draw[carry] (\source.south) -- (carry\i.north);
   }
   \node[note,anchor=east] at (-4.15,1.30) {distance 1};
   \node[note,anchor=east] at (-4.15,.10) {distance 2};
 
   % Operator legend and the exact Boolean expressions implemented by KSA4.v.
-  \node[pg,minimum width=.68cm,minimum height=.68cm] at (-4.65,-1.55) {$P,G$};
-  \node[note,anchor=west,text=Navy,align=left] at (-4.12,-1.55)
+  \node[pg,minimum width=.68cm,minimum height=.68cm] at (-4.65,-2.05) {$P,G$};
+  \node[note,anchor=west,text=Navy,align=left] at (-4.12,-2.05)
     {\textbf{Square}\\$P_i=a_i\oplus b_i$\\$G_i=a_i b_i$};
 
-  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.70cm,font=\scriptsize\sffamily] at (-.75,-1.55) {$P,G$};
-  \node[note,anchor=west,text=Navy,align=left] at (-.18,-1.55)
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.70cm,font=\scriptsize\sffamily] at (-.75,-2.05) {$P,G$};
+  \node[note,anchor=west,text=Navy,align=left] at (-.18,-2.05)
     {\textbf{Big Circle}\\$P=P_iP_{prev}$\\$G=G_i+P_iG_{prev}$};
 
-  \node[draw=Green,fill=Green!16,circle,minimum size=.56cm,font=\scriptsize\sffamily] at (3.50,-1.55) {$P,G$};
-  \node[note,anchor=west,text=Navy,align=left] at (3.98,-1.55)
+  \node[draw=Green,fill=Green!16,circle,minimum size=.56cm,font=\scriptsize\sffamily] at (3.50,-2.05) {$P,G$};
+  \node[note,anchor=west,text=Navy,align=left] at (3.98,-2.05)
     {\textbf{Small Circle}\\$P=P_i$\\$G=G_i$};
 
-  \node[note,text=Navy] at (0,-2.58)
+  \node[note,text=Navy] at (0,-3.10)
     {Carry and sum: $C_{i+1}=G_{i:0}$, \quad $s_i=p_i\oplus C_i$, \quad $C_0=0$.};
 \end{tikzpicture}
 \end{frame}
@@ -304,8 +305,8 @@
   \draw[data] (cla.south) -- (slo);
   \draw[data] (ksa.south) -- (shi);
   \draw[carry] (cla.east) -- node[above,note] {$C_4$} (ksa.west);
-  \node[label] (cout) at (5.0,.25) {$C_8$};
-  \draw[carry] (ksa.east) -- (cout);
+  \node[label,anchor=west] (cout) at (5.40,.25) {$C_8$};
+  \draw[carry] (ksa.east) -- (cout.west);
   \node[note] at (0,-2.15) {This repository's HA8 uses CLA4 for the low half and a carry-aware KSA4 for the high half.};
 \end{tikzpicture}
 \end{frame}
