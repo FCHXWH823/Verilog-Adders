@@ -62,7 +62,7 @@
 \begin{frame}{Carry Lookahead Adder (CLA): compute carries in parallel}
 \centering
 \begin{tikzpicture}[x=1cm,y=1cm]
-  \foreach \i/\x in {3/-3.6,2/-1.2,1/1.2,0/3.6}{
+  \foreach \i/\x in {0/-3.6,1/-1.2,2/1.2,3/3.6}{
     \node[block,minimum width=1.45cm,minimum height=1.25cm] (fa\i) at (\x,.85)
       {Full\\Adder};
     \node[label] (a\i) at ($(fa\i.north)+(-.34,.68)$) {$a_{\i}$};
@@ -78,22 +78,23 @@
 
   % The lookahead network supplies C1--C3 directly to the corresponding
   % full-adder stages instead of passing them through a ripple chain.
-  \coordinate (c3tap) at (-2.55,-1.08);
+  \coordinate (c1tap) at (-2.55,-1.08);
   \coordinate (c2tap) at (-.15,-1.08);
-  \coordinate (c1tap) at (2.25,-1.08);
-  \draw[carry] (c3tap) -- ++(0,1.93) -- node[above,note] {$C_3$} (fa3.east);
-  \draw[carry] (c2tap) -- ++(0,1.93) -- node[above,note] {$C_2$} (fa2.east);
-  \draw[carry] (c1tap) -- ++(0,1.93) -- node[above,note] {$C_1$} (fa1.east);
+  \coordinate (c3tap) at (2.25,-1.08);
+  \draw[carry] (c1tap) -- ++(0,1.93) -- node[above,note] {$C_1$} (fa1.west);
+  \draw[carry] (c2tap) -- ++(0,1.93) -- node[above,note] {$C_2$} (fa2.west);
+  \draw[carry] (c3tap) -- ++(0,1.93) -- node[above,note] {$C_3$} (fa3.west);
 
-  \node[label] (cin) at (5.12,.85) {$C_0$};
-  \draw[carry] (cin) -- (fa0.east);
-  \draw[carry] (cin) -- ++(.35,0) |- (look.east);
-  \node[label] (cout) at (-5.18,-1.55) {$C_4$};
-  \draw[carry] (look.west) -- (cout);
+  \node[label] (cin) at (-5.12,.85) {$C_0$};
+  \draw[carry] (cin) -- (fa0.west);
+  \draw[carry] (cin) -- ++(-.35,0) |- (look.west);
+  \coordinate (c4end) at (6.00,-1.55);
+  \draw[carry] (look.east) -- (c4end);
+  \node[label,anchor=west] at (6.12,-1.55) {$C_4$};
 
   % Operand bits also feed the generate/propagate logic, as in the reference
   % block diagram. They are repeated below to keep the signal flow legible.
-  \foreach \i/\x in {3/-3.6,2/-1.2,1/1.2,0/3.6}{
+  \foreach \i/\x in {0/-3.6,1/-1.2,2/1.2,3/3.6}{
     \node[label] (al\i) at (\x-.34,-2.78) {$a_{\i}$};
     \node[label] (bl\i) at (\x+.34,-2.78) {$b_{\i}$};
     \draw[data] (al\i) -- (look.south -| al\i);
