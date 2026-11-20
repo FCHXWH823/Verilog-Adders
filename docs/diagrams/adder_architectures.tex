@@ -133,25 +133,48 @@
 \begin{frame}{Carry Skip Adder (CSkipA)}
 \centering
 \begin{tikzpicture}[x=1cm,y=1cm]
-  \node[block,minimum width=1.85cm] (r0) at (-3.35,.45) {4-bit Ripple\\$S[3{:}0]$};
-  \node[block,minimum width=1.85cm] (r1) at (1.15,.45) {4-bit Ripple\\$S[7{:}4]$};
-  \node[mux,minimum width=1.45cm,inner xsep=3pt] (m0) at (-1.10,.45) {MUX};
-  \node[mux,minimum width=1.45cm,inner xsep=3pt] (m1) at (3.40,.45) {MUX};
-  \node[label] (cin) at (-5.10,.45) {$C_0=0$};
-  \draw[carry] (cin) -- (r0.west);
-  \draw[carry] (r0.east) -- node[below,note] {ripple} (m0.south west);
-  \draw[carry] (m0.east) -- (r1.west);
-  \draw[carry] (r1.east) -- node[below,note] {ripple} (m1.south west);
-  \node[label] (cout) at (5.05,.45) {$C_8$};
-  \draw[carry] (m1.east) -- (cout);
+  \foreach \i/\x in {0/-4.0,1/-1.95,2/.10,3/2.15}{
+    \node[block,minimum width=1.45cm,minimum height=1.22cm] (fa\i) at (\x,.55)
+      {Full\\Adder};
+    \node[label] (a\i) at ($(fa\i.north)+(-.30,.66)$) {$a_{\i}$};
+    \node[label] (b\i) at ($(fa\i.north)+(.30,.66)$) {$b_{\i}$};
+    \draw[data] (a\i) -- ($(fa\i.north)+(-.30,0)$);
+    \draw[data] (b\i) -- ($(fa\i.north)+(.30,0)$);
+    \node[label] (s\i) at ($(fa\i.south)+(0,-.52)$) {$s_{\i}$};
+    \draw[data] (fa\i.south) -- (s\i);
+  }
 
-  \draw[carry] (cin) to[out=60,in=150] node[above,note] {skip} (m0.north west);
-  \draw[carry] (m0.east) to[out=60,in=150] node[above,note] {skip} (m1.north west);
-  \node[smallblock] (p0) at (-1.10,-1.35) {$P_0=\bigwedge p_i$};
-  \node[smallblock] (p1) at (3.40,-1.35) {$P_1=\bigwedge p_i$};
-  \draw[control] (p0) -- (m0.south);
-  \draw[control] (p1) -- (m1.south);
-  \node[note] at (0,-2.35) {When every bit propagates, the incoming carry bypasses that block's ripple path.};
+  \node[label] (cin) at (-5.35,.55) {$C_0=C_{in}$};
+  \draw[carry] (cin) -- (fa0.west);
+  \draw[carry] (fa0.east) -- node[above,note] {$C_1$} (fa1.west);
+  \draw[carry] (fa1.east) -- node[above,note] {$C_2$} (fa2.west);
+  \draw[carry] (fa2.east) -- node[above,note] {$C_3$} (fa3.west);
+
+  % A narrow, vertical carry mux matching the conventional carry-skip block
+  % diagram: ripple carry enters at input 0 and bypass carry at input 1.
+  \coordinate (muxul) at (3.95,.98);
+  \coordinate (muxur) at (4.78,.75);
+  \coordinate (muxlr) at (4.78,-.98);
+  \coordinate (muxll) at (3.95,-.75);
+  \path[draw=Purple,fill=white,thick] (muxul) -- (muxur) -- (muxlr) -- (muxll) -- cycle;
+  \coordinate (muxzero) at (3.95,.55);
+  \coordinate (muxone) at (3.95,-.55);
+  \coordinate (muxselect) at (4.36,.87);
+  \coordinate (muxout) at (4.78,-.12);
+  \node[label] at (4.17,.55) {0};
+  \node[label] at (4.17,-.55) {1};
+  \draw[carry] (fa3.east) -- node[above,note] {$C_4^{ripple}$} (muxzero);
+  \node[label] (cout) at (5.55,-.12) {$C_4$};
+  \draw[carry] (muxout) -- (cout);
+
+  % If all four bits propagate, the incoming carry takes the lower bypass
+  % input of the mux instead of waiting for the four-stage ripple path.
+  \coordinate (cinbranch) at (-5.02,.55);
+  \draw[carry] (cinbranch) -- ++(0,-1.92) -| node[below,note,pos=.55] {skip path} (muxone);
+  \node[label,align=center] (propagate) at (4.35,2.05)
+    {$p_i=a_i\oplus b_i$\\$P_B=p_0p_1p_2p_3$};
+  \draw[control] (propagate.south) -- (muxselect);
+  \node[note] at (0,-2.15) {When $P_B=1$, the mux forwards $C_{in}$ directly; otherwise it uses the ripple carry.};
 \end{tikzpicture}
 \end{frame}
 
