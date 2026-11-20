@@ -105,27 +105,66 @@
 % 3. Carry Select Adder
 \begin{frame}{Carry Select Adder (CSA)}
 \centering
-\begin{tikzpicture}[x=1cm,y=1cm]
-  \node[note] at (-3.6,2.0) {Lower 4-bit group};
-  \node[smallblock] (l0) at (-4.2,.95) {RCA4\\$C_{in}=0$};
-  \node[smallblock] (l1) at (-4.2,-.35) {RCA4\\$C_{in}=1$};
-  \node[mux] (lm) at (-2.0,.30) {MUX};
-  \draw[data] (l0.east) -- (lm.north west);
-  \draw[data] (l1.east) -- (lm.south west);
-  \draw[control] (-3.0,-1.35) node[below,note] {$C_0=0$} -- (lm.south);
-  \coordinate (c4) at (-.15,.30);
-  \draw[data] (lm.east) -- node[above,note] {$S_{lo},\ C_4$} (c4);
+\begin{tikzpicture}[x=1cm,y=.90cm]
+  % Two complete carry chains are evaluated in parallel. The upper row
+  % assumes carry-in 0 and the lower row assumes carry-in 1.
+  \foreach \i/\x in {0/-3.3,1/-1.1,2/1.1,3/3.3}{
+    \node[smallblock,minimum width=1.12cm,minimum height=.70cm] (fa0\i) at (\x-.25,1.30)
+      {FA bit \i};
+    \node[smallblock,minimum width=1.12cm,minimum height=.70cm] (fa1\i) at (\x+.25,-.05)
+      {FA bit \i};
 
-  \node[note] at (2.6,2.0) {Upper 4-bit group};
-  \node[smallblock] (u0) at (1.5,.95) {RCA4\\$C_{in}=0$};
-  \node[smallblock] (u1) at (1.5,-.35) {RCA4\\$C_{in}=1$};
-  \node[mux] (um) at (3.7,.30) {MUX};
-  \draw[data] (u0.east) -- (um.north west);
-  \draw[data] (u1.east) -- (um.south west);
-  \draw[control] (c4) |- (1.0,-1.35) -| node[below,note,pos=.25] {$C_4$ selects} (um.south);
-  \coordinate (c8) at (5.35,.30);
-  \draw[data] (um.east) -- node[above,note] {$S_{hi},\ C_8$} (c8);
-  \node[note] at (0,-2.15) {Parallel candidate sums trade extra area for a shorter carry-dependent selection path.};
+    \node[label] (ab0\i) at (\x-.25,2.02) {$a_{\i},b_{\i}$};
+    \node[label] (ab1\i) at (\x+.25,.58) {$a_{\i},b_{\i}$};
+    \draw[data] (ab0\i) -- (fa0\i.north);
+    \draw[data] (ab1\i) -- (fa1\i.north);
+
+    % Downward sum mux: upper candidate enters on the left, lower candidate
+    % on the right, and the selected sum leaves at the bottom.
+    \coordinate (smul\i) at (\x-.66,-.86);
+    \coordinate (smur\i) at (\x+.66,-.86);
+    \coordinate (smlr\i) at (\x+.44,-1.42);
+    \coordinate (smll\i) at (\x-.44,-1.42);
+    \path[draw=Purple,fill=white,thick]
+      (smul\i) -- (smur\i) -- (smlr\i) -- (smll\i) -- cycle;
+    \node[note,text=Purple] at (\x,-1.13) {MUX};
+
+    \draw[data] (fa0\i.south) -- ++(0,-.22) -| (\x-.48,-.86);
+    \draw[data] (fa1\i.south) -- (\x+.34,-.86);
+    \node[label] (sum\i) at (\x,-1.93) {$s_{\i}$};
+    \draw[data] (\x,-1.42) -- (sum\i);
+  }
+
+  \node[note,anchor=east] (zero) at (-4.35,1.30) {candidate $C_{in}=0$};
+  \node[note,anchor=east] (one) at (-3.85,-.05) {candidate $C_{in}=1$};
+  \draw[carry] (zero.east) -- (fa00.west);
+  \draw[carry] (one.east) -- (fa10.west);
+  \foreach \i/\j in {0/1,1/2,2/3}{
+    \draw[carry] (fa0\i.east) -- (fa0\j.west);
+    \draw[carry] (fa1\i.east) -- (fa1\j.west);
+  }
+
+  % The final mux chooses the candidate carry-out. All signal flow remains
+  % left-to-right, matching the requested orientation.
+  \coordinate (cmul) at (4.38,.94);
+  \coordinate (cmur) at (5.10,.74);
+  \coordinate (cmlr) at (5.10,-.46);
+  \coordinate (cmll) at (4.38,-.66);
+  \path[draw=Purple,fill=white,thick] (cmul) -- (cmur) -- (cmlr) -- (cmll) -- cycle;
+  \node[label] at (4.58,.53) {0};
+  \node[label] at (4.58,-.26) {1};
+  \draw[carry] (fa03.east) -- ++(.15,0) |- (4.38,.53);
+  \draw[carry] (fa13.east) -- (4.38,-.26);
+  \node[label] (cout) at (5.72,.14) {$C_{out}$};
+  \draw[carry] (5.10,.14) -- (cout);
+
+  % The real carry-in selects all four sum bits and the final carry.
+  \node[label] (select) at (-4.35,-2.48) {$C_{in}$ selects};
+  \draw[control] (select) -- (4.72,-2.48);
+  \foreach \x in {-3.3,-1.1,1.1,3.3}{
+    \draw[control] (\x+.28,-2.48) -- (\x+.28,-1.42);
+  }
+  \draw[control] (4.72,-2.48) -- (4.72,-.56);
 \end{tikzpicture}
 \end{frame}
 
