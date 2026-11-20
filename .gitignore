@@ -1,0 +1,3 @@
+# Keep LaTeX/TikZ sources local; publish compiled PDFs and PNGs only.
+*.tex
+*.sty

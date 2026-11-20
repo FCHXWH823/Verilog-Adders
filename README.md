@@ -42,8 +42,6 @@ The repository's top-level adders assume an initial carry-in of zero. Internal h
 
 ## Adder architectures
 
-All figures below are exported from the shared TikZ source in
-[`docs/diagrams/adder_architectures.tex`](docs/diagrams/adder_architectures.tex).
 The course lecture slides use these same PNG files, so the README and slides
 show the same diagrams.
 
@@ -122,15 +120,10 @@ iverilog -g2012 -Wall -s RCA8 -o /tmp/rca8.vvp "Carry Ripple Adder/RCA8.v"
 
 Substitute another top-level name and source file to check a different implementation. Functional verification requires a testbench or another reference model.
 
-## Rebuilding the diagrams
+## Diagram files
 
-All six figures share one Beamer/TikZ source: [adder_architectures.tex](docs/diagrams/adder_architectures.tex). The compiled six-page version is available as [adder_architectures.pdf](docs/diagrams/adder_architectures.pdf).
-
-```sh
-cd docs/diagrams
-latexmk -xelatex -interaction=nonstopmode -halt-on-error adder_architectures.tex
-pdftoppm -png -r 200 adder_architectures.pdf png/architecture
-```
+The compiled six-page version is available as
+[adder_architectures.pdf](docs/diagrams/adder_architectures.pdf).
 
 The six exported pages correspond, in order, to RCA, CLA, CSA, Carry Skip, Kogge--Stone, and Hybrid. The repository's named PNG files are these pages renamed for stable README links.
 
