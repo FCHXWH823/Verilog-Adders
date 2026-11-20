@@ -186,7 +186,7 @@
     \draw[data] (fa\i.south) -- (s\i);
   }
 
-  \node[label,anchor=east] (cin) at (-5.55,.55) {$C_0=C_{in}$};
+  \node[label,anchor=east] (cin) at (-5.90,.55) {$C_0=C_{in}$};
   \draw[carry] (cin.east) -- (fa0.west);
   \draw[carry] (fa0.east) -- node[above,note] {$C_1$} (fa1.west);
   \draw[carry] (fa1.east) -- node[above,note] {$C_2$} (fa2.west);
@@ -199,21 +199,26 @@
   \coordinate (muxlr) at (5.20,-.62);
   \coordinate (muxll) at (4.40,-.82);
   \path[draw=Purple,fill=Purple!7,thick] (muxul) -- (muxur) -- (muxlr) -- (muxll) -- cycle;
-  \coordinate (muxzero) at (4.40,.42);
+  \coordinate (muxzero) at (4.40,.55);
   \coordinate (muxone) at (4.40,-.42);
   \coordinate (muxselect) at (4.80,.72);
   \coordinate (muxout) at (5.20,0);
   \node[note,text=Purple] at (4.86,0) {MUX};
-  \node[label] at (4.52,.42) {0};
+  \node[label] at (4.52,.55) {0};
   \node[label] at (4.52,-.42) {1};
   \draw[carry] (fa3.east) -- node[above,note] {$C_4^{ripple}$} (muxzero);
-  \node[label,anchor=west] (cout) at (6.25,0) {$C_4$};
+  \node[label,anchor=west] (cout) at (6.10,0) {$C_4$};
   \draw[carry] (muxout) -- (cout.west);
 
   % If all four bits propagate, the incoming carry takes the lower bypass
   % input of the mux instead of waiting for the four-stage ripple path.
-  \coordinate (cinbranch) at (-5.20,.55);
-  \draw[carry] (cinbranch) -- ++(0,-1.82) -| node[below,note,pos=.55] {skip path} (muxone);
+  \coordinate (cinbranch) at (-5.45,.55);
+  \coordinate (skipbottom) at (-5.45,-1.45);
+  \coordinate (skiprise) at (3.70,-1.45);
+  \coordinate (skipturn) at (3.70,-.42);
+  \draw[carry] (cinbranch) -- (skipbottom)
+    -- node[below,note,pos=.64] {skip path} (skiprise)
+    -- (skipturn) -- (muxone);
   \node[label,align=center] (propagate) at (4.80,1.92)
     {$p_i=a_i\oplus b_i$\\$P_B=p_0p_1p_2p_3$};
   \draw[control] (propagate.south) -- (muxselect);
