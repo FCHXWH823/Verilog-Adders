@@ -24,7 +24,7 @@ Carry Select Adder/       CSA4.v, CSA8.v
 Carry Skip Adder/         CSkipA4.v, CSkipA8.v
 Kogge-Stone Adder/        KSA4.v, KSA8.v
 Hybrid Adder/             HA8.v
-docs/diagrams/            Beamer/TikZ source and generated architecture figures
+docs/diagrams/            Generated architecture PDF and PNG figures
 ```
 
 Every top-level module uses the same basic interface:
