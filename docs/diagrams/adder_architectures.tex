@@ -241,13 +241,13 @@
     \draw[data] (in\i.south) -- (sq\i.north);
   }
 
-  % Prefix row 1: distance 1.
+  % First prefix row.
   \node[draw=Green,fill=Green!16,circle,minimum size=.56cm,font=\scriptsize\sffamily] (sc10) at (-3,.80) {$P,G$};
   \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc11) at (-1,.80) {$P,G$};
   \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc12) at (1,.80) {$P,G$};
   \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc13) at (3,.80) {$P,G$};
 
-  % Prefix row 2: distance 2.
+  % Second prefix row.
   \node[draw=Green,fill=Green!16,circle,minimum size=.56cm,font=\scriptsize\sffamily] (sc20) at (-3,-.50) {$P,G$};
   \node[draw=Green,fill=Green!16,circle,minimum size=.56cm,font=\scriptsize\sffamily] (sc21) at (-1,-.50) {$P,G$};
   \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc22) at (1,-.50) {$P,G$};
@@ -275,9 +275,6 @@
     \node[label] (carry\i) at (\x,-1.65) {$C_{\the\numexpr\i+1\relax}$};
     \draw[carry] (\source.south) -- (carry\i.north);
   }
-  \node[note,anchor=east] at (-4.15,.80) {distance 1};
-  \node[note,anchor=east] at (-4.15,-.50) {distance 2};
-
   % Operator legend: every operator is shown with every input that it
   % consumes, followed by the exact equations used in the RTL.
   \draw[draw=Navy,rounded corners=8pt,line width=.8pt]
