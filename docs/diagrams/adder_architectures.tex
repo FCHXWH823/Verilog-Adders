@@ -159,13 +159,14 @@
   \node[label] (cout) at (5.72,.14) {$C_{out}$};
   \draw[carry] (5.10,.14) -- (cout);
 
-  % The real carry-in selects all four sum bits and the final carry.
-  \node[label] (select) at (-4.35,-2.48) {$C_{in}$ selects};
-  \draw[control] (select) -- (4.72,-2.48);
+  % The real carry-in runs on a separate control bus. Each branch enters a
+  % mux from its side, leaving the bottom output exclusively for S_i.
+  \node[label] (select) at (-4.35,-2.35) {$C_{in}$ selects};
+  \draw[draw=Purple,thick,dashed] (select.east) -- (4.72,-2.35);
   \foreach \x in {-3.3,-1.1,1.1,3.3}{
-    \draw[control] (\x+.28,-2.48) -- (\x+.28,-1.42);
+    \draw[control] (\x-.82,-2.35) |- (\x-.55,-1.14);
   }
-  \draw[control] (4.72,-2.48) -- (4.72,-.56);
+  \draw[control] (4.72,-2.35) -- (4.72,-.56);
 \end{tikzpicture}
 \end{frame}
 
@@ -190,31 +191,32 @@
   \draw[carry] (fa1.east) -- node[above,note] {$C_2$} (fa2.west);
   \draw[carry] (fa2.east) -- node[above,note] {$C_3$} (fa3.west);
 
-  % A narrow, vertical carry mux matching the conventional carry-skip block
-  % diagram: ripple carry enters at input 0 and bypass carry at input 1.
-  \coordinate (muxul) at (3.95,.98);
-  \coordinate (muxur) at (4.78,.75);
-  \coordinate (muxlr) at (4.78,-.98);
-  \coordinate (muxll) at (3.95,-.75);
-  \path[draw=Purple,fill=white,thick] (muxul) -- (muxur) -- (muxlr) -- (muxll) -- cycle;
-  \coordinate (muxzero) at (3.95,.55);
-  \coordinate (muxone) at (3.95,-.55);
-  \coordinate (muxselect) at (4.36,.87);
-  \coordinate (muxout) at (4.78,-.12);
-  \node[label] at (4.17,.55) {0};
-  \node[label] at (4.17,-.55) {1};
+  % Compact vertical carry mux: ripple carry enters input 0 and bypass carry
+  % enters input 1. A shallow taper avoids the oversized wedge shape.
+  \coordinate (muxul) at (4.02,.82);
+  \coordinate (muxur) at (4.82,.62);
+  \coordinate (muxlr) at (4.82,-.62);
+  \coordinate (muxll) at (4.02,-.82);
+  \path[draw=Purple,fill=Purple!7,thick] (muxul) -- (muxur) -- (muxlr) -- (muxll) -- cycle;
+  \coordinate (muxzero) at (4.02,.42);
+  \coordinate (muxone) at (4.02,-.42);
+  \coordinate (muxselect) at (4.42,.72);
+  \coordinate (muxout) at (4.82,0);
+  \node[note,text=Purple] at (4.48,0) {MUX};
+  \node[label] at (4.14,.42) {0};
+  \node[label] at (4.14,-.42) {1};
   \draw[carry] (fa3.east) -- node[above,note] {$C_4^{ripple}$} (muxzero);
-  \node[label] (cout) at (5.55,-.12) {$C_4$};
+  \node[label] (cout) at (5.55,0) {$C_4$};
   \draw[carry] (muxout) -- (cout);
 
   % If all four bits propagate, the incoming carry takes the lower bypass
   % input of the mux instead of waiting for the four-stage ripple path.
   \coordinate (cinbranch) at (-5.02,.55);
-  \draw[carry] (cinbranch) -- ++(0,-1.92) -| node[below,note,pos=.55] {skip path} (muxone);
-  \node[label,align=center] (propagate) at (4.35,2.05)
+  \draw[carry] (cinbranch) -- ++(0,-1.82) -| node[below,note,pos=.55] {skip path} (muxone);
+  \node[label,align=center] (propagate) at (4.42,1.92)
     {$p_i=a_i\oplus b_i$\\$P_B=p_0p_1p_2p_3$};
   \draw[control] (propagate.south) -- (muxselect);
-  \node[note] at (0,-2.15) {When $P_B=1$, the mux forwards $C_{in}$ directly; otherwise it uses the ripple carry.};
+  \node[note] at (0,-2.05) {When $P_B=1$, the mux forwards $C_{in}$ directly; otherwise it uses the ripple carry.};
 \end{tikzpicture}
 \end{frame}
 
@@ -222,59 +224,66 @@
 \begin{frame}{Kogge--Stone Adder (KSA)}
 \centering
 \begin{tikzpicture}[x=1cm,y=.84cm]
-  % Four-bit prefix tree. Square operators create bit P/G pairs, Big Circle
-  % operators combine adjacent groups, and Small Circle operators emit carry.
+  % Every bit occupies one column and every prefix distance occupies one row.
+  % For a four-bit tree, C1 passes through two Small Circles, C2 through one,
+  % and C3/C4 use Big Circles in both prefix rows.
   \foreach \i/\x in {0/-3,1/-1,2/1,3/3}{
-    \node[pg,minimum width=.88cm,minimum height=.62cm] (sq\i) at (\x,2.35)
+    \node[pg,minimum width=.88cm,minimum height=.62cm] (sq\i) at (\x,2.45)
       {$P_{\i},G_{\i}$};
-    \node[label] (in\i) at (\x,3.03) {$a_{\i},b_{\i}$};
+    \node[label] (in\i) at (\x,3.10) {$a_{\i},b_{\i}$};
     \draw[data] (in\i) -- (sq\i.north);
   }
 
-  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.72cm,font=\scriptsize\sffamily] (bc11) at (-1,1.28) {$P,G$};
-  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.72cm,font=\scriptsize\sffamily] (bc12) at (1,1.28) {$P,G$};
-  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.72cm,font=\scriptsize\sffamily] (bc13) at (3,1.28) {$P,G$};
-  \draw[data] (sq1.south) -- (bc11);
-  \draw[data] (sq0.south) -- (bc11);
-  \draw[data] (sq2.south) -- (bc12);
-  \draw[data] (sq1.south) -- (bc12);
-  \draw[data] (sq3.south) -- (bc13);
-  \draw[data] (sq2.south) -- (bc13);
+  % Prefix row 1: distance 1.
+  \node[draw=Green,fill=Green!16,circle,minimum size=.56cm,font=\scriptsize\sffamily] (sc10) at (-3,1.30) {$P,G$};
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc11) at (-1,1.30) {$P,G$};
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc12) at (1,1.30) {$P,G$};
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc13) at (3,1.30) {$P,G$};
 
-  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.72cm,font=\scriptsize\sffamily] (bc22) at (1,.20) {$P,G$};
-  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.72cm,font=\scriptsize\sffamily] (bc23) at (3,.20) {$P,G$};
-  \draw[data] (bc12) -- (bc22);
-  \draw[data] (sq0.south) -- (bc22);
-  \draw[data] (bc13) -- (bc23);
-  \draw[data] (bc11) -- (bc23);
+  % Prefix row 2: distance 2.
+  \node[draw=Green,fill=Green!16,circle,minimum size=.56cm,font=\scriptsize\sffamily] (sc20) at (-3,.10) {$P,G$};
+  \node[draw=Green,fill=Green!16,circle,minimum size=.56cm,font=\scriptsize\sffamily] (sc21) at (-1,.10) {$P,G$};
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc22) at (1,.10) {$P,G$};
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc23) at (3,.10) {$P,G$};
 
-  \foreach \i/\x in {0/-3,1/-1,2/1,3/3}{
-    \node[draw=Green,fill=Green!16,circle,minimum size=.52cm,font=\scriptsize\sffamily] (sc\i) at (\x,-.75) {$C$};
-    \node[label] (carry\i) at (\x,-1.25) {$C_{\the\numexpr\i+1\relax}$};
-    \draw[carry] (sc\i) -- (carry\i);
+  % Prefix wires intentionally omit arrowheads to keep crossings legible.
+  \draw[draw=Navy,thick] (sq0.south) -- (sc10.north);
+  \draw[draw=Navy,thick] (sq1.south) -- (bc11.north);
+  \draw[draw=Navy,thick] (sq0.south) -- (bc11.north west);
+  \draw[draw=Navy,thick] (sq2.south) -- (bc12.north);
+  \draw[draw=Navy,thick] (sq1.south) -- (bc12.north west);
+  \draw[draw=Navy,thick] (sq3.south) -- (bc13.north);
+  \draw[draw=Navy,thick] (sq2.south) -- (bc13.north west);
+
+  \draw[draw=Navy,thick] (sc10.south) -- (sc20.north);
+  \draw[draw=Navy,thick] (bc11.south) -- (sc21.north);
+  \draw[draw=Navy,thick] (bc12.south) -- (bc22.north);
+  \draw[draw=Navy,thick] (sc10.south) -- (bc22.north west);
+  \draw[draw=Navy,thick] (bc13.south) -- (bc23.north);
+  \draw[draw=Navy,thick] (bc11.south) -- (bc23.north west);
+
+  \foreach \i/\x/\source in {0/-3/sc20,1/-1/sc21,2/1/bc22,3/3/bc23}{
+    \node[label] (carry\i) at (\x,-.55) {$C_{\the\numexpr\i+1\relax}$};
+    \draw[carry] (\source.south) -- (carry\i);
   }
-  \draw[data] (sq0.south) -- (sc0);
-  \draw[data] (bc11) -- (sc1);
-  \draw[data] (bc22) -- (sc2);
-  \draw[data] (bc23) -- (sc3);
-  \node[note,anchor=east] at (-4.15,1.28) {distance 1};
-  \node[note,anchor=east] at (-4.15,.20) {distance 2};
+  \node[note,anchor=east] at (-4.15,1.30) {distance 1};
+  \node[note,anchor=east] at (-4.15,.10) {distance 2};
 
   % Operator legend and the exact Boolean expressions implemented by KSA4.v.
-  \node[pg,minimum width=.68cm,minimum height=.68cm] at (-4.65,-2.12) {$P,G$};
-  \node[note,anchor=west,text=Navy,align=left] at (-4.12,-2.12)
+  \node[pg,minimum width=.68cm,minimum height=.68cm] at (-4.65,-1.55) {$P,G$};
+  \node[note,anchor=west,text=Navy,align=left] at (-4.12,-1.55)
     {\textbf{Square}\\$P_i=a_i\oplus b_i$\\$G_i=a_i b_i$};
 
-  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.70cm,font=\scriptsize\sffamily] at (-.75,-2.12) {$P,G$};
-  \node[note,anchor=west,text=Navy,align=left] at (-.18,-2.12)
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.70cm,font=\scriptsize\sffamily] at (-.75,-1.55) {$P,G$};
+  \node[note,anchor=west,text=Navy,align=left] at (-.18,-1.55)
     {\textbf{Big Circle}\\$P=P_iP_{prev}$\\$G=G_i+P_iG_{prev}$};
 
-  \node[draw=Green,fill=Green!16,circle,minimum size=.52cm,font=\scriptsize\sffamily] at (3.50,-2.12) {$C$};
-  \node[note,anchor=west,text=Navy,align=left] at (3.98,-2.12)
-    {\textbf{Small Circle}\\$C_i=G_i$};
+  \node[draw=Green,fill=Green!16,circle,minimum size=.56cm,font=\scriptsize\sffamily] at (3.50,-1.55) {$P,G$};
+  \node[note,anchor=west,text=Navy,align=left] at (3.98,-1.55)
+    {\textbf{Small Circle}\\$P=P_i$\\$G=G_i$};
 
-  \node[note,text=Navy] at (0,-3.12)
-    {Sum post-processing: $s_i=p_i\oplus C_i$, with $C_0=0$.};
+  \node[note,text=Navy] at (0,-2.58)
+    {Carry and sum: $C_{i+1}=G_{i:0}$, \quad $s_i=p_i\oplus C_i$, \quad $C_0=0$.};
 \end{tikzpicture}
 \end{frame}
 
