@@ -62,24 +62,43 @@
 \begin{frame}{Carry Lookahead Adder (CLA): compute carries in parallel}
 \centering
 \begin{tikzpicture}[x=1cm,y=1cm]
-  \foreach \i/\x in {0/-3.3,1/-1.1,2/1.1,3/3.3}{
-    \node[pg] (pg\i) at (\x,1.5) {$P_{\i},G_{\i}$};
-    \node[label] at ($(pg\i.north)+(0,.48)$) {$a_{\i},b_{\i}$};
-    \draw[data] ($(pg\i.north)+(0,.42)$) -- (pg\i.north);
+  \foreach \i/\x in {3/-3.6,2/-1.2,1/1.2,0/3.6}{
+    \node[block,minimum width=1.45cm,minimum height=1.25cm] (fa\i) at (\x,.85)
+      {Full\\Adder};
+    \node[label] (a\i) at ($(fa\i.north)+(-.34,.68)$) {$a_{\i}$};
+    \node[label] (b\i) at ($(fa\i.north)+(.34,.68)$) {$b_{\i}$};
+    \draw[data] (a\i) -- ($(fa\i.north)+(-.34,0)$);
+    \draw[data] (b\i) -- ($(fa\i.north)+(.34,0)$);
+    \node[label] (s\i) at ($(fa\i.south)+(0,-.54)$) {$s_{\i}$};
+    \draw[data] (fa\i.south) -- (s\i);
   }
-  \node[block,minimum width=8.5cm,minimum height=1.15cm] (look) at (0,.05)
-    {Carry Lookahead Network\\[-1mm]\scriptsize expands $C_{i+1}=G_i+P_iC_i$ so $C_1\ldots C_4$ are formed without a ripple chain};
-  \foreach \i in {0,1,2,3}{\draw[data] (pg\i.south) -- (look.north -| pg\i);}
-  \foreach \i/\x in {0/-3.3,1/-1.1,2/1.1,3/3.3}{
-    \node[smallblock] (xor\i) at (\x,-1.45) {XOR};
-    \draw[data] (pg\i.south) -- ++(0,-.35) -| (xor\i.north);
-    \draw[carry] (look.south -| xor\i) -- (xor\i.north east);
-    \node[label] (sum\i) at ($(xor\i.south)+(0,-.48)$) {$s_{\i}$};
-    \draw[data] (xor\i.south) -- (sum\i);
+
+  \node[block,fill=BlueLight!65,minimum width=9.55cm,minimum height=.92cm] (look) at (0,-1.55)
+    {Carry Lookahead Logic\\[-1mm]\scriptsize Generate $\boldsymbol{\cdot}$ Propagate $\boldsymbol{\cdot}$ Carry};
+
+  % The lookahead network supplies C1--C3 directly to the corresponding
+  % full-adder stages instead of passing them through a ripple chain.
+  \coordinate (c3tap) at (-2.55,-1.08);
+  \coordinate (c2tap) at (-.15,-1.08);
+  \coordinate (c1tap) at (2.25,-1.08);
+  \draw[carry] (c3tap) -- ++(0,1.93) -- node[above,note] {$C_3$} (fa3.east);
+  \draw[carry] (c2tap) -- ++(0,1.93) -- node[above,note] {$C_2$} (fa2.east);
+  \draw[carry] (c1tap) -- ++(0,1.93) -- node[above,note] {$C_1$} (fa1.east);
+
+  \node[label] (cin) at (5.12,.85) {$C_0$};
+  \draw[carry] (cin) -- (fa0.east);
+  \draw[carry] (cin) -- ++(.35,0) |- (look.east);
+  \node[label] (cout) at (-5.18,-1.55) {$C_4$};
+  \draw[carry] (look.west) -- (cout);
+
+  % Operand bits also feed the generate/propagate logic, as in the reference
+  % block diagram. They are repeated below to keep the signal flow legible.
+  \foreach \i/\x in {3/-3.6,2/-1.2,1/1.2,0/3.6}{
+    \node[label] (al\i) at (\x-.34,-2.78) {$a_{\i}$};
+    \node[label] (bl\i) at (\x+.34,-2.78) {$b_{\i}$};
+    \draw[data] (al\i) -- (look.south -| al\i);
+    \draw[data] (bl\i) -- (look.south -| bl\i);
   }
-  \node[label] (cout) at (5.1,.05) {$C_4$};
-  \draw[carry] (look.east) -- (cout);
-  \node[note] at (0,-2.55) {More carry logic and fan-in, but much shorter carry latency than an RCA.};
 \end{tikzpicture}
 \end{frame}
 
