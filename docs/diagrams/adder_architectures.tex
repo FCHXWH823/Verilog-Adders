@@ -218,54 +218,62 @@
 \end{frame}
 
 % 5. Kogge-Stone Adder
-\begin{frame}{Kogge--Stone Adder (KSA): parallel-prefix carry tree}
+\begin{frame}{Kogge--Stone Adder (KSA)}
 \centering
-\begin{tikzpicture}[x=.92cm,y=.82cm]
-  \foreach \i in {0,...,7}{
-    \pgfmathsetmacro{\x}{\i-3.5}
-    \node[pg] (p\i) at (\x,2.25) {$P_{\i},G_{\i}$};
-    \node[label] at (\x,2.95) {$a_{\i},b_{\i}$};
-    \draw[data] (\x,2.85) -- (p\i.north);
+\begin{tikzpicture}[x=1cm,y=.84cm]
+  % Four-bit prefix tree. Square operators create bit P/G pairs, Big Circle
+  % operators combine adjacent groups, and Small Circle operators emit carry.
+  \foreach \i/\x in {0/-3,1/-1,2/1,3/3}{
+    \node[pg,minimum width=.88cm,minimum height=.62cm] (sq\i) at (\x,2.35)
+      {$P_{\i},G_{\i}$};
+    \node[label] (in\i) at (\x,3.03) {$a_{\i},b_{\i}$};
+    \draw[data] (in\i) -- (sq\i.north);
   }
-  \foreach \i in {0,...,7}{
-    \pgfmathsetmacro{\x}{\i-3.5}
-    \node[grayprefix] (s1\i) at (\x,1.10) {};
-    \draw[data] (p\i.south) -- (s1\i);
+
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.72cm,font=\scriptsize\sffamily] (bc11) at (-1,1.28) {$P,G$};
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.72cm,font=\scriptsize\sffamily] (bc12) at (1,1.28) {$P,G$};
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.72cm,font=\scriptsize\sffamily] (bc13) at (3,1.28) {$P,G$};
+  \draw[data] (sq1.south) -- (bc11);
+  \draw[data] (sq0.south) -- (bc11);
+  \draw[data] (sq2.south) -- (bc12);
+  \draw[data] (sq1.south) -- (bc12);
+  \draw[data] (sq3.south) -- (bc13);
+  \draw[data] (sq2.south) -- (bc13);
+
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.72cm,font=\scriptsize\sffamily] (bc22) at (1,.20) {$P,G$};
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.72cm,font=\scriptsize\sffamily] (bc23) at (3,.20) {$P,G$};
+  \draw[data] (bc12) -- (bc22);
+  \draw[data] (sq0.south) -- (bc22);
+  \draw[data] (bc13) -- (bc23);
+  \draw[data] (bc11) -- (bc23);
+
+  \foreach \i/\x in {0/-3,1/-1,2/1,3/3}{
+    \node[draw=Green,fill=Green!16,circle,minimum size=.52cm,font=\scriptsize\sffamily] (sc\i) at (\x,-.75) {$C$};
+    \node[label] (carry\i) at (\x,-1.25) {$C_{\the\numexpr\i+1\relax}$};
+    \draw[carry] (sc\i) -- (carry\i);
   }
-  \foreach \i in {1,...,7}{
-    \pgfmathtruncatemacro{\j}{\i-1}
-    \draw[data] (p\j.south) -- (s1\i);
-    \node[prefnode] at (s1\i) {};
-  }
-  \foreach \i in {0,...,7}{
-    \pgfmathsetmacro{\x}{\i-3.5}
-    \node[grayprefix] (s2\i) at (\x,-.05) {};
-    \draw[data] (s1\i) -- (s2\i);
-  }
-  \foreach \i in {2,...,7}{
-    \pgfmathtruncatemacro{\j}{\i-2}
-    \draw[data] (s1\j) -- (s2\i);
-    \node[prefnode] at (s2\i) {};
-  }
-  \foreach \i in {0,...,7}{
-    \pgfmathsetmacro{\x}{\i-3.5}
-    \node[grayprefix] (s3\i) at (\x,-1.20) {};
-    \draw[data] (s2\i) -- (s3\i);
-  }
-  \foreach \i in {4,...,7}{
-    \pgfmathtruncatemacro{\j}{\i-4}
-    \draw[data] (s2\j) -- (s3\i);
-    \node[prefnode] at (s3\i) {};
-  }
-  \foreach \i in {0,...,7}{
-    \pgfmathsetmacro{\x}{\i-3.5}
-    \node[label] (sum\i) at (\x,-2.10) {$S_{\i}$};
-    \draw[carry] (s3\i) -- (sum\i);
-  }
-  \node[note,anchor=east] at (-4.65,1.10) {distance 1};
-  \node[note,anchor=east] at (-4.65,-.05) {distance 2};
-  \node[note,anchor=east] at (-4.65,-1.20) {distance 4};
-  \node[note] at (0,-2.85) {Prefix depth grows logarithmically; wiring and prefix-node count are comparatively high.};
+  \draw[data] (sq0.south) -- (sc0);
+  \draw[data] (bc11) -- (sc1);
+  \draw[data] (bc22) -- (sc2);
+  \draw[data] (bc23) -- (sc3);
+  \node[note,anchor=east] at (-4.15,1.28) {distance 1};
+  \node[note,anchor=east] at (-4.15,.20) {distance 2};
+
+  % Operator legend and the exact Boolean expressions implemented by KSA4.v.
+  \node[pg,minimum width=.68cm,minimum height=.68cm] at (-4.65,-2.12) {$P,G$};
+  \node[note,anchor=west,text=Navy,align=left] at (-4.12,-2.12)
+    {\textbf{Square}\\$P_i=a_i\oplus b_i$\\$G_i=a_i b_i$};
+
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.70cm,font=\scriptsize\sffamily] at (-.75,-2.12) {$P,G$};
+  \node[note,anchor=west,text=Navy,align=left] at (-.18,-2.12)
+    {\textbf{Big Circle}\\$P=P_iP_{prev}$\\$G=G_i+P_iG_{prev}$};
+
+  \node[draw=Green,fill=Green!16,circle,minimum size=.52cm,font=\scriptsize\sffamily] at (3.50,-2.12) {$C$};
+  \node[note,anchor=west,text=Navy,align=left] at (3.98,-2.12)
+    {\textbf{Small Circle}\\$C_i=G_i$};
+
+  \node[note,text=Navy] at (0,-3.12)
+    {Sum post-processing: $s_i=p_i\oplus C_i$, with $C_0=0$.};
 \end{tikzpicture}
 \end{frame}
 
