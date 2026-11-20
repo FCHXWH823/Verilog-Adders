@@ -26,6 +26,7 @@
   prefnode/.style={draw=Navy,fill=Navy,circle,minimum size=.27cm,inner sep=0pt},
   grayprefix/.style={draw=Navy,fill=white,circle,minimum size=.27cm,inner sep=0pt},
   data/.style={-{Latex[length=2.2mm]},draw=Navy,thick},
+  prefixarrow/.style={-{Latex[length=1.9mm]},draw=Navy,thick},
   carry/.style={-{Latex[length=2.2mm]},draw=Orange,very thick},
   control/.style={-{Latex[length=2.2mm]},draw=Purple,thick,dashed},
   note/.style={font=\scriptsize\sffamily,text=Gray,align=center},
@@ -229,67 +230,87 @@
 % 5. Kogge-Stone Adder
 \begin{frame}{Kogge--Stone Adder (KSA)}
 \centering
-\begin{tikzpicture}[x=1cm,y=.84cm]
+\begin{tikzpicture}[scale=.82,every node/.style={transform shape},x=1cm,y=1cm]
   % Every bit occupies one column and every prefix distance occupies one row.
   % For a four-bit tree, C1 passes through two Small Circles, C2 through one,
   % and C3/C4 use Big Circles in both prefix rows.
   \foreach \i/\x in {0/-3,1/-1,2/1,3/3}{
-    \node[pg,minimum width=.88cm,minimum height=.62cm] (sq\i) at (\x,2.45)
+    \node[pg,minimum width=.88cm,minimum height=.62cm] (sq\i) at (\x,2.05)
       {$P_{\i},G_{\i}$};
-    \node[label] (in\i) at (\x,3.45) {$a_{\i},b_{\i}$};
+    \node[label] (in\i) at (\x,3.15) {$a_{\i},b_{\i}$};
     \draw[data] (in\i.south) -- (sq\i.north);
   }
 
   % Prefix row 1: distance 1.
-  \node[draw=Green,fill=Green!16,circle,minimum size=.56cm,font=\scriptsize\sffamily] (sc10) at (-3,1.30) {$P,G$};
-  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc11) at (-1,1.30) {$P,G$};
-  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc12) at (1,1.30) {$P,G$};
-  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc13) at (3,1.30) {$P,G$};
+  \node[draw=Green,fill=Green!16,circle,minimum size=.56cm,font=\scriptsize\sffamily] (sc10) at (-3,.80) {$P,G$};
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc11) at (-1,.80) {$P,G$};
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc12) at (1,.80) {$P,G$};
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc13) at (3,.80) {$P,G$};
 
   % Prefix row 2: distance 2.
-  \node[draw=Green,fill=Green!16,circle,minimum size=.56cm,font=\scriptsize\sffamily] (sc20) at (-3,.10) {$P,G$};
-  \node[draw=Green,fill=Green!16,circle,minimum size=.56cm,font=\scriptsize\sffamily] (sc21) at (-1,.10) {$P,G$};
-  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc22) at (1,.10) {$P,G$};
-  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc23) at (3,.10) {$P,G$};
+  \node[draw=Green,fill=Green!16,circle,minimum size=.56cm,font=\scriptsize\sffamily] (sc20) at (-3,-.50) {$P,G$};
+  \node[draw=Green,fill=Green!16,circle,minimum size=.56cm,font=\scriptsize\sffamily] (sc21) at (-1,-.50) {$P,G$};
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc22) at (1,-.50) {$P,G$};
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.74cm,font=\scriptsize\sffamily] (bc23) at (3,-.50) {$P,G$};
 
-  % Prefix wires intentionally omit arrowheads to keep crossings legible.
-  \draw[draw=Navy,thick] (sq0.south) -- (sc10.north);
-  \draw[draw=Navy,thick] (sq1.south) -- (bc11.north);
-  \draw[draw=Navy,thick] (sq0.south) -- (bc11.north west);
-  \draw[draw=Navy,thick] (sq2.south) -- (bc12.north);
-  \draw[draw=Navy,thick] (sq1.south) -- (bc12.north west);
-  \draw[draw=Navy,thick] (sq3.south) -- (bc13.north);
-  \draw[draw=Navy,thick] (sq2.south) -- (bc13.north west);
+  % Every prefix dependency is directed from its source operator to the
+  % operator that consumes it. Arrowheads make both vertical and diagonal
+  % dependencies explicit.
+  \draw[prefixarrow] (sq0.south) -- (sc10.north);
+  \draw[prefixarrow] (sq1.south) -- (bc11.north);
+  \draw[prefixarrow] (sq0.south) -- (bc11.north west);
+  \draw[prefixarrow] (sq2.south) -- (bc12.north);
+  \draw[prefixarrow] (sq1.south) -- (bc12.north west);
+  \draw[prefixarrow] (sq3.south) -- (bc13.north);
+  \draw[prefixarrow] (sq2.south) -- (bc13.north west);
 
-  \draw[draw=Navy,thick] (sc10.south) -- (sc20.north);
-  \draw[draw=Navy,thick] (bc11.south) -- (sc21.north);
-  \draw[draw=Navy,thick] (bc12.south) -- (bc22.north);
-  \draw[draw=Navy,thick] (sc10.south) -- (bc22.north west);
-  \draw[draw=Navy,thick] (bc13.south) -- (bc23.north);
-  \draw[draw=Navy,thick] (bc11.south) -- (bc23.north west);
+  \draw[prefixarrow] (sc10.south) -- (sc20.north);
+  \draw[prefixarrow] (bc11.south) -- (sc21.north);
+  \draw[prefixarrow] (bc12.south) -- (bc22.north);
+  \draw[prefixarrow] (sc10.south) -- (bc22.north west);
+  \draw[prefixarrow] (bc13.south) -- (bc23.north);
+  \draw[prefixarrow] (bc11.south) -- (bc23.north west);
 
   \foreach \i/\x/\source in {0/-3/sc20,1/-1/sc21,2/1/bc22,3/3/bc23}{
-    \node[label] (carry\i) at (\x,-1.00) {$C_{\the\numexpr\i+1\relax}$};
+    \node[label] (carry\i) at (\x,-1.65) {$C_{\the\numexpr\i+1\relax}$};
     \draw[carry] (\source.south) -- (carry\i.north);
   }
-  \node[note,anchor=east] at (-4.15,1.30) {distance 1};
-  \node[note,anchor=east] at (-4.15,.10) {distance 2};
+  \node[note,anchor=east] at (-4.15,.80) {distance 1};
+  \node[note,anchor=east] at (-4.15,-.50) {distance 2};
 
-  % Operator legend and the exact Boolean expressions implemented by KSA4.v.
-  \node[pg,minimum width=.68cm,minimum height=.68cm] at (-4.65,-2.05) {$P,G$};
-  \node[note,anchor=west,text=Navy,align=left] at (-4.12,-2.05)
+  % Operator legend: every operator is shown with every input that it
+  % consumes, followed by the exact equations used in the RTL.
+  \draw[draw=Navy,rounded corners=8pt,line width=.8pt]
+    (-5.50,-4.90) rectangle (5.50,-1.95);
+  \node[label,anchor=west,font=\small\bfseries\sffamily] at (-5.20,-2.16)
+    {Legend};
+
+  % Square operator: two primary inputs.
+  \node[pg,minimum width=.84cm,minimum height=.72cm] (legsq) at (-3.00,-3.25) {$P_i,G_i$};
+  \node[label] (lega) at (-3.27,-2.28) {$a_i$};
+  \node[label] (legb) at (-2.73,-2.28) {$b_i$};
+  \draw[data] (lega.south) -- (legsq.north -| lega);
+  \draw[data] (legb.south) -- (legsq.north -| legb);
+  \node[note,anchor=north,text=Navy,align=left] at (-3.00,-3.60)
     {\textbf{Square}\\$P_i=a_i\oplus b_i$\\$G_i=a_i b_i$};
 
-  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.70cm,font=\scriptsize\sffamily] at (-.75,-2.05) {$P,G$};
-  \node[note,anchor=west,text=Navy,align=left] at (-.18,-2.05)
+  % Big Circle operator: the current group and the previous group.
+  \node[draw=Orange,fill=OrangeLight,circle,minimum size=.78cm,font=\scriptsize\sffamily]
+    (legbig) at (.50,-3.25) {$P,G$};
+  \node[label] (legbigi) at (.50,-2.28) {$P_i,G_i$};
+  \node[label,anchor=west] (legbigp) at (1.45,-2.35) {$P_{prev},G_{prev}$};
+  \draw[data] (legbigi.south) -- (legbig.north);
+  \draw[data] (legbigp.south west) -- (legbig.north east);
+  \node[note,anchor=north,text=Navy,align=left] at (.50,-3.60)
     {\textbf{Big Circle}\\$P=P_iP_{prev}$\\$G=G_i+P_iG_{prev}$};
 
-  \node[draw=Green,fill=Green!16,circle,minimum size=.56cm,font=\scriptsize\sffamily] at (3.50,-2.05) {$P,G$};
-  \node[note,anchor=west,text=Navy,align=left] at (3.98,-2.05)
+  % Small Circle operator: one current-group input.
+  \node[draw=Green,fill=Green!16,circle,minimum size=.60cm,font=\scriptsize\sffamily]
+    (legsmall) at (3.90,-3.25) {$P,G$};
+  \node[label] (legsmalli) at (3.90,-2.28) {$P_i,G_i$};
+  \draw[data] (legsmalli.south) -- (legsmall.north);
+  \node[note,anchor=north,text=Navy,align=left] at (3.90,-3.60)
     {\textbf{Small Circle}\\$P=P_i$\\$G=G_i$};
-
-  \node[note,text=Navy] at (0,-3.10)
-    {Carry and sum: $C_{i+1}=G_{i:0}$, \quad $s_i=p_i\oplus C_i$, \quad $C_0=0$.};
 \end{tikzpicture}
 \end{frame}
 
