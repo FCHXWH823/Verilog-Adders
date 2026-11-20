@@ -42,6 +42,11 @@ The repository's top-level adders assume an initial carry-in of zero. Internal h
 
 ## Adder architectures
 
+All figures below are exported from the shared TikZ source in
+[`docs/diagrams/adder_architectures.tex`](docs/diagrams/adder_architectures.tex).
+The course lecture slides use these same PNG files, so the README and slides
+show the same diagrams.
+
 ### Ripple Carry Adder
 
 ![Ripple Carry Adder architecture](docs/diagrams/png/ripple-carry.png)
@@ -78,7 +83,11 @@ Code: [CSkipA4.v](Carry%20Skip%20Adder/CSkipA4.v) · [CSkipA8.v](Carry%20Skip%20
 
 ![Kogge--Stone Adder architecture](docs/diagrams/png/kogge-stone.png)
 
-The KSA combines generate/propagate pairs in a prefix tree with spans of 1, 2, 4, and so on. Its prefix depth grows logarithmically with bit width, although the dense tree increases wiring and prefix-node count.
+The arrows show how generate/propagate pairs move through the prefix tree. The
+legend defines all three operators: a Square creates `P_i,G_i` from `a_i,b_i`;
+a Big Circle combines the current and previous `P,G` pairs; and a Small Circle
+passes one `P,G` pair to the next row. The tree has few logic levels, but it
+uses many wires and prefix nodes.
 
 Code: [KSA4.v](Kogge-Stone%20Adder/KSA4.v) · [KSA8.v](Kogge-Stone%20Adder/KSA8.v)
 
